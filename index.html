@@ -1,269 +1,33 @@
 <!DOCTYPE html>
-
-<html class="light" lang="ko"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "surface-dim": "#d5dbdd",
-                        "surface-tint": "#216969",
-                        "on-tertiary-fixed": "#094155",
-                        "tertiary-fixed-dim": "#a7d5ef",
-                        "surface-container-high": "#e5e9eb",
-                        "on-primary-fixed-variant": "#1c6565",
-                        "error": "#a83836",
-                        "surface-bright": "#f8f9fa",
-                        "inverse-primary": "#b6fafa",
-                        "inverse-surface": "#0c0f10",
-                        "on-primary": "#e0fffe",
-                        "primary-fixed-dim": "#9de0e0",
-                        "on-surface": "#2d3335",
-                        "secondary-fixed-dim": "#bedad7",
-                        "surface-container-low": "#f1f4f5",
-                        "on-error-container": "#6e0a12",
-                        "surface": "#f8f9fa",
-                        "background": "#f8f9fa",
-                        "on-tertiary-container": "#245469",
-                        "surface-variant": "#dee3e6",
-                        "primary": "#216969",
-                        "tertiary-dim": "#29586e",
-                        "on-background": "#2d3335",
-                        "primary-dim": "#0e5d5d",
-                        "surface-container": "#ebeef0",
-                        "outline": "#767c7e",
-                        "on-primary-fixed": "#004748",
-                        "tertiary-fixed": "#b5e3fd",
-                        "error-container": "#fa746f",
-                        "surface-container-lowest": "#ffffff",
-                        "on-primary-container": "#0b5b5c",
-                        "on-tertiary-fixed-variant": "#2f5d73",
-                        "secondary": "#4a6461",
-                        "on-surface-variant": "#5a6062",
-                        "on-secondary": "#e2fffb",
-                        "on-secondary-fixed": "#2b4442",
-                        "on-tertiary": "#f3faff",
-                        "surface-container-highest": "#dee3e6",
-                        "tertiary": "#37647a",
-                        "outline-variant": "#adb3b5",
-                        "on-secondary-container": "#3d5654",
-                        "secondary-container": "#cce8e5",
-                        "error-dim": "#67040d",
-                        "primary-container": "#abefee",
-                        "secondary-fixed": "#cce8e5",
-                        "tertiary-container": "#b5e3fd",
-                        "on-secondary-fixed-variant": "#47605e",
-                        "primary-fixed": "#abefee",
-                        "secondary-dim": "#3e5855",
-                        "inverse-on-surface": "#9b9d9e",
-                        "on-error": "#fff7f6"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
-                    },
-                    "fontFamily": {
-                        "headline": ["Inter", "Pretendard"],
-                        "body": ["Inter", "Pretendard"],
-                        "label": ["Inter", "Pretendard"]
-                    }
-                },
-            },
-        }
-    </script>
-<style>
-        body { font-family: 'Inter', 'Pretendard', sans-serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            font-size: 20px;
-        }
-        .bg-glass {
-            backdrop-filter: blur(16px);
-        }
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>차곡차곡 - ChagogChagog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="bg-background text-on-surface min-h-screen pb-24">
-<!-- Top Navigation Anchor -->
-<header class="fixed top-0 left-0 w-full z-50 px-4 py-3 flex flex-col gap-2 bg-[#f8f9fa]/85 backdrop-blur-md">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-2">
-<button class="transition-all duration-200 active:scale-95 p-1 hover:bg-[#dee3e6]/50 rounded-lg">
-<span class="material-symbols-outlined text-[#216969]">grid_view</span>
-</button>
-<h1 class="text-lg font-semibold text-[#216969]" style="font-family: 'Pixelify Sans', monospace; letter-spacing: 0.05em;">차곡차곡</h1>
-</div>
-<div class="flex items-center gap-3">
-<button class="transition-all duration-200 active:scale-95 p-1 hover:bg-[#dee3e6]/50 rounded-lg">
-<span class="material-symbols-outlined text-[#216969]">search</span>
-</button>
-</div>
-</div>
-<!-- Breadcrumb / Search Integration -->
-<div class="flex items-center gap-2 text-[0.6875rem] font-medium text-on-surface-variant">
-<span class="text-primary font-bold">홈</span>
-<span class="material-symbols-outlined text-[12px]">chevron_right</span>
-<span>공간별 카테고리</span>
-</div>
-</header>
-<main class="mt-28 px-4 flex flex-col gap-8">
-<!-- Space Category Section -->
-<section>
-<div class="flex items-center justify-between mb-4">
-<h2 class="text-base font-semibold text-on-surface tracking-tight">공간별 카테고리</h2>
-<button class="flex items-center gap-1 text-[0.6875rem] font-medium text-primary hover:bg-primary-container px-2 py-1 rounded-lg transition-colors">
-<span class="material-symbols-outlined text-[16px]">add</span>
-                    공간 추가
-                </button>
-</div>
-<!-- Bento-style Grid for Spaces -->
-<div class="grid grid-cols-3 gap-3">
-<!-- Living Room -->
-<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col items-center justify-center gap-3 aspect-square transition-all duration-200 active:scale-95">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">chair</span>
-</div>
-<span class="text-[0.75rem] font-medium text-on-surface">거실</span>
-</div>
-<!-- Bedroom -->
-<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col items-center justify-center gap-3 aspect-square transition-all duration-200 active:scale-95">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">bed</span>
-</div>
-<span class="text-[0.75rem] font-medium text-on-surface">침실</span>
-</div>
-<!-- Kitchen -->
-<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col items-center justify-center gap-3 aspect-square transition-all duration-200 active:scale-95">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">restaurant</span>
-</div>
-<span class="text-[0.75rem] font-medium text-on-surface">주방</span>
-</div>
-<!-- Bathroom -->
-<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col items-center justify-center gap-3 aspect-square transition-all duration-200 active:scale-95">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">bathtub</span>
-</div>
-<span class="text-[0.75rem] font-medium text-on-surface">욕실</span>
-</div>
-<!-- Dress Room -->
-<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col items-center justify-center gap-3 aspect-square transition-all duration-200 active:scale-95">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">checkroom</span>
-</div>
-<span class="text-[0.75rem] font-medium text-on-surface">드레스룸</span>
-</div>
-<!-- Utility Room -->
-<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col items-center justify-center gap-3 aspect-square transition-all duration-200 active:scale-95">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">local_laundry_service</span>
-</div>
-<span class="text-[0.75rem] font-medium text-on-surface">다용도실</span>
-</div>
-</div>
-</section>
-<!-- Needs Organizing Section -->
-<section class="flex flex-col gap-4">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-2">
-<h2 class="text-base font-semibold text-on-surface tracking-tight">정리 필요</h2>
-<span class="bg-error text-on-error text-[10px] px-1.5 py-0.5 rounded-full font-bold">3</span>
-</div>
-<button class="text-[0.6875rem] text-on-surface-variant font-medium">전체보기</button>
-</div>
-<!-- List items with alert badges -->
-<div class="flex flex-col gap-2">
-<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center gap-4 transition-all duration-200 active:scale-[0.98]">
-<div class="relative">
-<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">dresser</span>
-</div>
-<div class="absolute -top-1 -right-1 w-5 h-5 bg-error text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white font-bold">!</div>
-</div>
-<div class="flex-1">
-<h3 class="text-[0.875rem] font-semibold text-on-surface">겨울 코트 정리</h3>
-<p class="text-[0.75rem] text-on-surface-variant">드레스룸 • 2주째 방치됨</p>
-</div>
-<span class="material-symbols-outlined text-outline-variant text-[20px]">chevron_right</span>
-</div>
-<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center gap-4 transition-all duration-200 active:scale-[0.98]">
-<div class="relative">
-<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">kitchen</span>
-</div>
-<div class="absolute -top-1 -right-1 w-5 h-5 bg-error text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white font-bold">!</div>
-</div>
-<div class="flex-1">
-<h3 class="text-[0.875rem] font-semibold text-on-surface">냉장고 유통기한 확인</h3>
-<p class="text-[0.75rem] text-on-surface-variant">주방 • 신선식품 정리 필요</p>
-</div>
-<span class="material-symbols-outlined text-outline-variant text-[20px]">chevron_right</span>
-</div>
-<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center gap-4 transition-all duration-200 active:scale-[0.98]">
-<div class="relative">
-<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">inventory_2</span>
-</div>
-<div class="absolute -top-1 -right-1 w-5 h-5 bg-error text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white font-bold">!</div>
-</div>
-<div class="flex-1">
-<h3 class="text-[0.875rem] font-semibold text-on-surface">베란다 수납 박스</h3>
-<p class="text-[0.75rem] text-on-surface-variant">다용도실 • 라벨링 미완료</p>
-</div>
-<span class="material-symbols-outlined text-outline-variant text-[20px]">chevron_right</span>
-</div>
-</div>
-</section>
-<!-- Signature Search Input for Editorial Feel -->
-<section class="mt-2">
-<div class="bg-surface-container-high/50 p-3 rounded-lg flex items-center gap-3">
-<span class="material-symbols-outlined text-outline text-[20px]">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-[0.75rem] w-full placeholder:text-outline-variant" placeholder="물건이나 공간을 검색하세요" type="text"/>
-</div>
-</section>
-</main>
-<!-- Bottom Navigation Shell -->
-<nav class="fixed bottom-0 left-0 w-full z-50 bg-[#f8f9fa]/85 backdrop-blur-md flex flex-col items-center border-t border-[#adb3b5]/15">
-    <!-- Legal Links Footer (Added for App Store compliance) -->
-    <div class="w-full flex justify-center gap-6 py-2 border-b border-[#adb3b5]/10 bg-[#f8f9fa]">
-        <a href="privacy.html" class="text-[10px] text-outline hover:text-primary underline">개인정보 처리방침</a>
-        <a href="terms.html" class="text-[10px] text-outline hover:text-primary underline">이용약관</a>
+</head>
+<body class="bg-[#f8f9fa] text-[#2d3335] min-h-screen flex flex-col items-center justify-center p-8">
+    <div class="max-w-md w-full text-center space-y-8">
+        <h1 class="text-6xl font-bold text-[#216969] mb-4" style="font-family: 'Pixelify Sans', cursive;">차곡차곡</h1>
+        <p class="text-xl font-medium text-gray-500">세상에서 가장 쉬운 수납 정리 도우미</p>
+        
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 rotate-1">
+            <p class="text-lg font-bold">Soon on App Store</p>
+            <p class="text-sm text-gray-400 mt-2">열심히 출시를 준비하고 있습니다!</p>
+        </div>
+
+        <div class="pt-12 flex flex-col gap-4 items-center">
+            <a href="privacy.html" class="text-sm text-gray-400 hover:text-[#216969] underline">개인정보 처리방침</a>
+            <a href="terms.html" class="text-sm text-gray-400 hover:text-[#216969] underline">이용약관</a>
+        </div>
+        
+        <footer class="mt-20 text-xs text-gray-300">
+            © 2026 차곡차곡(ChagogChagog). All rights reserved.
+        </footer>
     </div>
-    
-    <div class="w-full flex justify-around items-center px-4 pb-safe h-16">
-        <!-- Home (Active) -->
-        <a class="flex flex-col items-center justify-center bg-[#abefee] text-[#216969] rounded-xl px-3 py-1 transition-transform duration-200 ease-out active:scale-90" href="#">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
-            <span class="font-['Pretendard','Inter'] text-[0.6875rem] font-medium">홈</span>
-        </a>
-        <!-- Storage -->
-        <a class="flex flex-col items-center justify-center text-[#5A6062] px-3 py-1 hover:text-[#216969] transition-transform duration-200 ease-out active:scale-90" href="#">
-            <span class="material-symbols-outlined">inventory_2</span>
-            <span class="font-['Pretendard','Inter'] text-[0.6875rem] font-medium">보관함</span>
-        </a>
-        <!-- Notifications -->
-        <a class="flex flex-col items-center justify-center text-[#5A6062] px-3 py-1 hover:text-[#216969] transition-transform duration-200 ease-out active:scale-90" href="#">
-            <span class="material-symbols-outlined">notifications</span>
-            <span class="font-['Pretendard','Inter'] text-[0.6875rem] font-medium">알림</span>
-        </a>
-        <!-- Settings -->
-        <a class="flex flex-col items-center justify-center text-[#5A6062] px-3 py-1 hover:text-[#216969] transition-transform duration-200 ease-out active:scale-90" href="#">
-            <span class="material-symbols-outlined">settings</span>
-            <span class="font-['Pretendard','Inter'] text-[0.6875rem] font-medium">설정</span>
-        </a>
-    </div>
-</nav>
-</body></html>
+</body>
+</html>
