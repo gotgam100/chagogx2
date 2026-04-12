@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, Modal, TextInput, Image, Alert,
   FlatList, ScrollView, KeyboardAvoidingView, Platform, PanResponder,
-  Animated, SectionList, StyleSheet, Share, Dimensions, LayoutAnimation
+  Animated, SectionList, StyleSheet, Share, Dimensions, LayoutAnimation, Linking
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
@@ -1463,16 +1463,15 @@ function ViewerBtn({ label, onPress, disabled, variant, hidden }) {
         alignItems: 'center', justifyContent: 'center',
       }}
     >
-      {!hidden && (
-        <Text
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.7}
-          style={{ fontSize: 13, fontWeight: '700', color: fg, textAlign: 'center' }}
-        >
-          {label}
-        </Text>
-      )}
+      {/* 항상 렌더링 — hidden 시 투명 색상만 변경하여 Yoga 레이아웃 계산을 고정 */}
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+        style={{ fontSize: 13, fontWeight: '700', textAlign: 'center', color: hidden ? 'transparent' : fg }}
+      >
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -1759,21 +1758,11 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
           <SettingRow icon="🔔" label="공지사항" onPress={() => setNoticeModalVisible(true)} />
         </View>
 
-        {/* 이용약관 및 정책 */}
-        <Text style={{ fontSize: 12, fontWeight: '700', color: C.onSurfaceVariant, paddingHorizontal: 20, paddingBottom: 6, letterSpacing: 0.5 }}>
-          이용약관 및 정책
-        </Text>
-        <View style={{ borderRadius: 14, overflow: 'hidden', marginHorizontal: 16, marginBottom: 24 }}>
-          <SettingRow icon="📄" label="이용약관" onPress={() => setTermsModalVisible(true)} />
-          <SettingRow icon="🔒" label="개인정보 처리방침" onPress={() => setPolicyModalVisible(true)} />
-          <SettingRow icon="📜" label="오픈소스 라이선스" onPress={() => setLicenseModalVisible(true)} />
-        </View>
-
         {/* 앱 정보 */}
         <Text style={{ fontSize: 12, fontWeight: '700', color: C.onSurfaceVariant, paddingHorizontal: 20, paddingBottom: 6, letterSpacing: 0.5 }}>
           앱 정보
         </Text>
-        <View style={{ borderRadius: 14, overflow: 'hidden', marginHorizontal: 16 }}>
+        <View style={{ borderRadius: 14, overflow: 'hidden', marginHorizontal: 16, marginBottom: 24 }}>
           <View style={{
             flexDirection: 'row', alignItems: 'center', gap: 14,
             backgroundColor: '#fff', paddingHorizontal: 18, paddingVertical: 16,
@@ -1823,6 +1812,16 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
             <Text style={{ flex: 1, fontSize: 16, fontWeight: '500', color: C.onSurface }}>친구에게 앱 추천하기</Text>
             <Text style={{ fontSize: 18, color: C.outlineVariant }}>›</Text>
           </TouchableOpacity>
+        </View>
+
+        {/* 이용약관 및 정책 */}
+        <Text style={{ fontSize: 12, fontWeight: '700', color: C.onSurfaceVariant, paddingHorizontal: 20, paddingBottom: 6, letterSpacing: 0.5 }}>
+          이용약관 및 정책
+        </Text>
+        <View style={{ borderRadius: 14, overflow: 'hidden', marginHorizontal: 16, marginBottom: 24 }}>
+          <SettingRow icon="📄" label="이용약관" onPress={() => setTermsModalVisible(true)} />
+          <SettingRow icon="🔒" label="개인정보 처리방침" onPress={() => setPolicyModalVisible(true)} />
+          <SettingRow icon="📜" label="오픈소스 라이선스" onPress={() => setLicenseModalVisible(true)} />
         </View>
 
         {/* 데이터 초기화 버튼 */}
@@ -1935,23 +1934,58 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
       <Modal visible={termsModalVisible} transparent animationType="slide" onRequestClose={() => setTermsModalVisible(false)}>
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
           activeOpacity={1} onPress={() => setTermsModalVisible(false)}>
-          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40, height: '85%' }}>
-             <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-               <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>📄 이용약관</Text>
-               <TouchableOpacity onPress={() => setTermsModalVisible(false)}>
-                 <Text style={{ fontSize: 16, color: C.primary, fontWeight: '600' }}>닫기</Text>
-               </TouchableOpacity>
-             </View>
-             <ScrollView contentContainerStyle={{ padding: 20 }}>
-               <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 22 }}>
-                 [이용약관 샘플]{'\n\n'}
-                 제 1조 (목적){'\n'}
-                 본 약관은 '차곡차곡' 앱이 제공하는 서비스 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.{'\n\n'}
-                 제 2조 (서비스의 내용){'\n'}
-                 '차곡차곡'은 개인의 물건 정리 및 위치 기록을 위한 디지털 도구를 제공합니다...
-               </Text>
-             </ScrollView>
-          </View>
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}
+            style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
+            <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>📄 이용약관</Text>
+              <TouchableOpacity onPress={() => setTermsModalVisible(false)}>
+                <Text style={{ fontSize: 16, color: C.primary, fontWeight: '600' }}>닫기</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: C.primary, marginBottom: 4 }}>차곡차곡 서비스 이용약관</Text>
+              <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 23 }}>
+                {'\n■ 제 1 조 (목적)\n'}
+                {'이 약관은 「뽀뽀필름(백승화)」(이하 "회사")와 이용 고객(이하 "회원") 간에 웹사이트 및 앱, 어플리케이션을 통해 회사가 제공하는 「차곡차곡」(이하 "서비스")의 가입조건 및 이용에 관한 제반 사항과 기타 필요한 사항을 규정함을 목적으로 합니다.\n'}
+                {'\n■ 제 2 조 (약관의 효력 및 변경)\n'}
+                {'① 본 약관의 내용은 서비스 화면에 게시하거나 기타의 방법으로 공지하고, 본 약관에 동의한 여러분 모두에게 그 효력이 발생합니다.\n'}
+                {'② 회사는 필요한 경우 관련 법령을 위배하지 않는 범위 내에서 본 약관을 변경할 수 있습니다. 변경 시 시행일자 15일 전부터 공지사항을 통해 고지합니다.\n'}
+                {'③ 회원은 개정약관에 동의하지 않을 경우 이용계약을 해지할 수 있으며, 서비스 내 \'계정 탈퇴\' 메뉴를 통해 처리할 수 있습니다.\n'}
+                {'\n■ 제 3 조 (용어의 정의)\n'}
+                {'① "회원"이란 본 약관에 동의하고 서비스에 이메일 계정을 등록하여 서비스를 이용하는 자를 말합니다.\n'}
+                {'② "콘텐츠"란 회원이 서비스 내에 생성하고 저장하는 공간(Space), 가구, 구획, 물건(Object) 등의 모든 계층형 데이터 및 명칭을 말합니다.\n'}
+                {'\n■ 제 4 조 (이용계약 체결)\n'}
+                {'① 이용계약은 가입신청자가 약관에 동의하고 이메일 주소를 제공하여 회원가입 신청을 하고, 회사가 이를 승낙함으로써 체결됩니다.\n'}
+                {'② 비정상적인 방법으로 가입을 시도하거나 이메일 도용 등이 확인된 경우 승낙을 유보하거나 거절할 수 있습니다.\n'}
+                {'\n■ 제 5 조 (회원의 계정 및 비밀번호 관리 의무)\n'}
+                {'① 회원의 계정과 비밀번호에 관한 관리책임은 회원 본인에게 있으며, 이를 제3자가 이용하도록 하여서는 안 됩니다.\n'}
+                {'② 계정이 도용되거나 제3자가 사용하고 있음을 인지한 경우 즉시 회사에 통지하고 안내에 따라야 합니다.\n'}
+                {'\n■ 제 6 조 (서비스의 제공 및 변경)\n'}
+                {'① 회사는 집안의 공간과 물건을 계층적으로 분류·정리할 수 있는 관리 기능 및 데이터 동기화 서비스를 제공합니다.\n'}
+                {'② 더 나은 서비스를 위해 소프트웨어 업데이트 버전을 제공할 수 있으며, 이에 따라 기능이 추가·변경·제거될 수 있습니다.\n'}
+                {'③ 회사는 서비스 변경·종료로 인한 손해에 대해 회사의 고의 또는 중과실이 없는 한 배상하지 않습니다.\n'}
+                {'\n■ 제 7 조 (콘텐츠의 관리 및 백업)\n'}
+                {'① 회원이 입력한 콘텐츠의 권리와 책임은 회원 본인에게 있습니다.\n'}
+                {'② 회사는 데이터 보호를 위해 최선의 조치를 다하나, 천재지변·시스템 오류 등으로 인한 데이터 유실에 대해서는 회사의 고의 또는 중과실이 없는 한 책임을 지지 않습니다. 회원은 중요한 데이터를 스스로 백업할 의무가 있습니다.\n'}
+                {'\n■ 제 8 조 (서비스의 제한 및 중지)\n'}
+                {'① 보수점검, 교체 및 고장, 통신두절 등 운영상 타당한 이유가 있는 경우 서비스를 일시적으로 중지할 수 있습니다.\n'}
+                {'② 회원이 본 약관의 의무를 위반하거나 서비스 운영을 방해한 경우 서비스 이용을 제한하거나 계약을 해지할 수 있습니다.\n'}
+                {'\n■ 제 9 조 (개인정보 보호)\n'}
+                {'회사는 "개인정보보호법" 등 관계 법령에 따라 회원의 개인정보를 보호하기 위해 노력합니다.\n'}
+                {'\n■ 제 10 조 (책임제한)\n'}
+                {'① 회사는 천재지변 또는 이에 준하는 불가항력으로 인해 서비스를 제공할 수 없는 경우 책임이 면제됩니다.\n'}
+                {'② 회원의 귀책사유로 인한 서비스 이용 장애에 대해서는 책임을 지지 않습니다.\n'}
+                {'\n부칙\n'}
+                {'본 약관은 2026년 4월 12일부터 적용됩니다.\n'}
+              </Text>
+            </ScrollView>
+            {/* 외부 링크 버튼 */}
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://gotgam100.github.io/chagogx2/terms.html')}
+              style={{ marginHorizontal: 20, marginTop: 12, marginBottom: 36, paddingVertical: 13, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: C.primary }}>
+              <Text style={{ fontSize: 14, fontWeight: '600', color: C.primary }}>🔗 웹에서 전문 보기</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
 
@@ -1959,24 +1993,56 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
       <Modal visible={policyModalVisible} transparent animationType="slide" onRequestClose={() => setPolicyModalVisible(false)}>
         <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
           activeOpacity={1} onPress={() => setPolicyModalVisible(false)}>
-          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40, height: '85%' }}>
-             <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-               <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>🔒 개인정보 처리방침</Text>
-               <TouchableOpacity onPress={() => setPolicyModalVisible(false)}>
-                 <Text style={{ fontSize: 16, color: C.primary, fontWeight: '600' }}>닫기</Text>
-               </TouchableOpacity>
-             </View>
-             <ScrollView contentContainerStyle={{ padding: 20 }}>
-               <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 22 }}>
-                 [개인정보 처리방침 샘플]{'\n\n'}
-                 1. 수집하는 개인정보 항목{'\n'}
-                 - 필수항목: 이메일 주소, 비밀번호{'\n'}
-                 - 자동수집항목: 앱 이용 기록, 기기 정보{'\n\n'}
-                 2. 개인정보의 수집 및 이용 목적{'\n'}
-                 - 서비스 제공 및 계정 관리, 데이터 백업 및 복구...
-               </Text>
-             </ScrollView>
-          </View>
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}
+            style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
+            <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>🔒 개인정보 처리방침</Text>
+              <TouchableOpacity onPress={() => setPolicyModalVisible(false)}>
+                <Text style={{ fontSize: 16, color: C.primary, fontWeight: '600' }}>닫기</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: C.primary, marginBottom: 4 }}>차곡차곡 개인정보 처리방침</Text>
+              <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 23 }}>
+                {'뽀뽀필름(백승화)은 이용자의 개인정보를 중요시하며, "개인정보보호법" 등 관련 법령을 준수하고 있습니다.\n'}
+                {'\n■ 1. 수집하는 개인정보의 항목 및 수집 방법\n'}
+                {'· 필수 수집 항목 (회원가입 시): 이메일 주소, 비밀번호(암호화 처리)\n'}
+                {'· 자동 수집 항목: 서비스 이용 기록(공간·가구·구획·물건 구조 데이터), 기기 식별 정보(디바이스 ID), OS 버전, 앱 접속 로그\n'}
+                {'\n■ 2. 개인정보의 수집 및 이용 목적\n'}
+                {'· 회원 관리: 이메일 로그인 본인 확인, 부정이용 방지, 계정 탈퇴 처리\n'}
+                {'· 서비스 제공: 기기 간 계층형 데이터 동기화, 백업 지원\n'}
+                {'· 신규 서비스 개발 및 통계: 기능 개선을 위한 사용 통계 분석 및 오류 진단\n'}
+                {'\n■ 3. 개인정보의 보유 및 이용 기간\n'}
+                {'회원 탈퇴 후 30일 간 보관 후 영구 삭제합니다. 단, 관계 법령에 의해 보존이 필요한 경우 해당 기간 동안 보관합니다.\n'}
+                {'\n■ 4. 개인정보의 파기 절차 및 방법\n'}
+                {'앱 내 [설정 > 개인정보 관리 > 계정 삭제] 메뉴를 통해 탈퇴 요청 시, 계정 정보 및 서버에 동기화된 모든 데이터를 복구 불가능한 상태로 즉시 파기합니다.\n'}
+                {'\n■ 5. 개인정보의 제3자 제공\n'}
+                {'회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다. 단, 이용자 사전 동의 또는 법령에 의한 수사기관 요구 시 예외적으로 제공할 수 있습니다.\n'}
+                {'\n■ 6. 개인정보 처리 위탁\n'}
+                {'· 수탁업체: Google LLC (Firebase)\n'}
+                {'· 위탁 업무: 앱 데이터 DB 보관 및 서버 클라우드 연동\n'}
+                {'· 서버가 해외에 위치한 경우 데이터는 암호화되어 전송 및 보관됩니다.\n'}
+                {'\n■ 7. 이용자의 권리와 그 행사 방법\n'}
+                {'이용자는 언제든지 개인정보를 조회·수정하거나 탈퇴(동의 철회)를 요청할 수 있습니다. 앱 내 설정 메뉴 또는 이메일(qbeck104@gmail.com)로 요청하실 수 있습니다.\n'}
+                {'\n■ 8. 개인정보의 안전성 확보 조치\n'}
+                {'· 비밀번호 암호화: 비밀번호는 암호화되어 저장·관리됩니다.\n'}
+                {'· 해킹 등에 대비한 기술적 대책: 서버 보안 수준을 최신 상태로 유지합니다.\n'}
+                {'\n■ 9. 개인정보 보호책임자\n'}
+                {'· 담당자: 정보보호 담당자\n'}
+                {'· 연락처: qbeck104@gmail.com\n'}
+                {'\n■ 10. 방침 변경 고지\n'}
+                {'본 방침 변경 시 개정 최소 7일 전에 앱 내 공지사항을 통해 사전 고지합니다.\n'}
+                {'\n부칙\n'}
+                {'본 개인정보 처리방침은 2026년 4월 12일부터 적용됩니다.\n'}
+              </Text>
+            </ScrollView>
+            {/* 외부 링크 버튼 */}
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://gotgam100.github.io/chagogx2/privacy.html')}
+              style={{ marginHorizontal: 20, marginTop: 12, marginBottom: 36, paddingVertical: 13, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: C.primary }}>
+              <Text style={{ fontSize: 14, fontWeight: '600', color: C.primary }}>🔗 웹에서 전문 보기</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
 
@@ -1992,14 +2058,75 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
                </TouchableOpacity>
              </View>
              <ScrollView contentContainerStyle={{ padding: 20 }}>
-               <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 22 }}>
-                 이 앱은 다음과 같은 오픈소스 소프트웨어를 사용합니다.{'\n\n'}
-                 - React / React Native (MIT License){'\n'}
-                 - Expo (MIT License){'\n'}
-                 - Firebase SDK (Apache 2.0){'\n'}
-                 - React Native Gesture Handler (MIT License){'\n'}
-                 - Async Storage (MIT License){'\n'}
-                 ...
+               <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
+                 {'이 앱은 다음과 같은 오픈소스 소프트웨어를 사용합니다.\n\n'}
+
+                 {'■ React\n'}
+                 {'Copyright (c) Meta Platforms, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ React Native\n'}
+                 {'Copyright (c) Meta Platforms, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo SDK\n'}
+                 {'Copyright (c) 650 Industries, Inc. (aka Expo)\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Vector Icons (@expo/vector-icons)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Document Picker (expo-document-picker)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo File System (expo-file-system)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Font (expo-font)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Haptics (expo-haptics)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Image Picker (expo-image-picker)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Sharing (expo-sharing)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Status Bar (expo-status-bar)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Expo Updates (expo-updates)\n'}
+                 {'Copyright (c) 650 Industries, Inc.\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ Firebase JavaScript SDK\n'}
+                 {'Copyright (c) Google LLC\n'}
+                 {'Apache License 2.0\n\n'}
+
+                 {'■ React Native Async Storage\n'}
+                 {'(@react-native-async-storage/async-storage)\n'}
+                 {'Copyright (c) React Native Community\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ React Native Gesture Handler\n'}
+                 {'(react-native-gesture-handler)\n'}
+                 {'Copyright (c) Software Mansion\n'}
+                 {'MIT License\n\n'}
+
+                 {'■ React Native Safe Area Context\n'}
+                 {'(react-native-safe-area-context)\n'}
+                 {'Copyright (c) Th3rdwave\n'}
+                 {'MIT License\n'}
                </Text>
              </ScrollView>
           </View>
