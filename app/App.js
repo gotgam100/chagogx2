@@ -80,6 +80,7 @@ export default function App() {
 
   // Recent icons
   const [recentIcons, setRecentIcons] = useState([]);
+  const [colsByLevel, setColsByLevel] = useState({ 0: 3, 1: 3, 2: 3, 3: 3 });
   const addToRecent = (ic) => setRecentIcons(prev => [ic, ...prev.filter(x => x !== ic)].slice(0, 5));
 
   const level = path.length;
@@ -459,6 +460,13 @@ export default function App() {
         </View>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <TouchableOpacity
+          style={[S.addBtn, { backgroundColor: LC.pill + '80' }]}
+          onPress={() => setColsByLevel(prev => ({ ...prev, [level]: prev[level] === 3 ? 2 : 3 }))}
+        >
+          <Text style={{ fontSize: 14, color: LC.accent }}>{colsByLevel[level] === 3 ? '⊞' : '▦'}</Text>
+          <Text style={[S.addBtnText, { color: LC.accent }]}>크기 조절</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={[S.addBtn, { backgroundColor: LC.pill + '80' }]} onPress={handleAdd}>
           <Text style={{ fontSize: 16, color: LC.accent }}>+</Text>
           <Text style={[S.addBtnText, { color: LC.accent }]}>{LEVEL_NAMES[level]} 추가</Text>
@@ -574,8 +582,8 @@ export default function App() {
                       showsVerticalScrollIndicator={false}
                     >
                     <HierarchySortableGrid
-                      numColumns={3}
-                      itemHeight={CARD_H}
+                      numColumns={colsByLevel[level] ?? 3}
+                      itemHeight={(GRID_W / (colsByLevel[level] ?? 3)) * (5 / 4)}
                       data={items.map(item => ({
                         ...item,
                         key: item.id
@@ -586,10 +594,12 @@ export default function App() {
                       onManualQty={handleManualQty}
                       renderItem={(item) => {
                         const itemLevel = item.level ?? 3;
+                        const cols = colsByLevel[level] ?? 3;
                         return (itemLevel === 3 || isItemNode(item)) ? (
                           <ItemCard
                             item={item}
                             level={itemLevel}
+                            numColumns={cols}
                             onMenuPress={() => handleMenuPress(item)}
                             onUpdateQty={handleUpdateQty}
                             onManualQty={handleManualQty}
@@ -598,6 +608,7 @@ export default function App() {
                           <CategoryCard
                             item={item}
                             level={itemLevel}
+                            numColumns={cols}
                             onMenuPress={() => handleMenuPress(item)}
                           />
                         );
@@ -616,7 +627,7 @@ export default function App() {
 
               {/* ── Bottom Nav ── */}
               <View style={S.bottomNav}>
-                <NavTab icon="home" label="홈" isActive={activeTab === 'home'} onPress={() => { setActiveTab('home'); if (path.length > 0) navigateTo([]); }} />
+                <NavTab icon="home" label="홈" isActive={activeTab === 'home'} onPress={() => { setPath([]); setActiveTab('home'); }} />
                 <NavTab icon="🗂️" label="정리" isActive={activeTab === 'viewer'} onPress={() => setActiveTab('viewer')} />
                 <NavTab icon="inventory-2" label="물건들" isActive={activeTab === 'inventory'} onPress={() => setActiveTab('inventory')} />
                 <NavTab icon="🔬" label="실험실" isActive={activeTab === 'playground'} onPress={() => setActiveTab('playground')} />

@@ -297,7 +297,8 @@ export function searchHierarchy(nodes, query, pathLabels = [], pathIds = []) {
   for (const node of nodes) {
     if (!node.none && node.label.toLowerCase().includes(q)) {
       results.push({
-        id: node.id, icon: node.icon, label: node.label,
+        id: node.id, icon: node.icon, photoUri: node.photoUri,
+        label: node.label,
         quantity: node.quantity,
         level: node.level,
         pathLabels,

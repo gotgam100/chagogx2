@@ -53,7 +53,7 @@ export default StyleSheet.create({
     alignItems:'center', justifyContent:'center', gap:6, paddingVertical:8, paddingHorizontal:4,
     shadowColor:'#000', shadowOffset:{width:0,height:1}, shadowOpacity:0.05, shadowRadius:4, elevation:1,
   },
-  itemIconBg: { width:64, height:64, borderRadius:32, backgroundColor:C.primaryContainer, alignItems:'center', justifyContent:'center' },
+  itemIconBg: { width:64, height:64, borderRadius:32, backgroundColor:C.primaryContainer, alignItems:'center', justifyContent:'center', overflow:'hidden' },
   itemCardLabel: { fontSize:13, fontWeight:'600', color:C.onSurface, textAlign:'center' },
   itemQtyRow: { flexDirection:'row', alignItems:'center', gap:3 },
   itemQtyBtn: { padding:2 },

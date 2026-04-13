@@ -419,20 +419,30 @@ const NONE_TEXT   = '#a0a0a0';
 const LEVEL_CARD_BG     = ['#f0fefd', '#f5f0ff', '#eef6ff', '#fff8ee'];
 const LEVEL_ICON_BG     = ['#abefee', '#e0ccf8', '#cce4f8', '#fde5c0'];
 
-export function CategoryCard({ item, onMenuPress, level = 0 }) {
+export function CategoryCard({ item, onMenuPress, level = 0, numColumns = 3 }) {
   const isNone = !!item.none;
   const cardBg = isNone ? NONE_CARD : (LEVEL_CARD_BG[level] || LEVEL_CARD_BG[0]);
   const iconBg = isNone ? NONE_CIRCLE : (LEVEL_ICON_BG[level] || LEVEL_ICON_BG[0]);
+  const sc = 3 / numColumns;
+  const circleSize = Math.round(72 * sc);
 
   return (
     <View style={[
       S.spaceCard,
       { backgroundColor: cardBg, width: '100%', height: '100%', aspectRatio: undefined },
     ]}>
-      <View style={[S.spaceIconBg, { backgroundColor: iconBg }]}>
-        <PhotoOrIcon photoUri={item.photoUri} icon={item.icon} circleSize={56} iconSize={30} bgColor={iconBg} />
-      </View>
-      <Text style={[S.spaceLabel, isNone && { color: NONE_TEXT }]} numberOfLines={2}>{item.label}</Text>
+      {item.photoUri ? (
+        <Image
+          source={{ uri: item.photoUri }}
+          style={{ width: circleSize, height: circleSize, borderRadius: circleSize / 2 }}
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={[S.spaceIconBg, { backgroundColor: iconBg, width: circleSize, height: circleSize, borderRadius: circleSize / 2 }]}>
+          <EmojiIcon name={item.icon || '📦'} size={Math.round(30 * sc)} />
+        </View>
+      )}
+      <Text style={[S.spaceLabel, { fontSize: Math.round(14 * sc) }, isNone && { color: NONE_TEXT }]} numberOfLines={2}>{item.label}</Text>
       
       {item.memo && (
         <View style={{ position: 'absolute', top: 6, right: 6, width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(255,255,255,0.85)', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 }}>
@@ -443,20 +453,30 @@ export function CategoryCard({ item, onMenuPress, level = 0 }) {
   );
 }
 
-export function ItemCard({ item, onMenuPress, onUpdateQty, onManualQty, level = 3 }) {
+export function ItemCard({ item, onMenuPress, onUpdateQty, onManualQty, level = 3, numColumns = 3 }) {
   const qty = item.quantity ?? 1;
   const cardBg = LEVEL_CARD_BG[level] || LEVEL_CARD_BG[3];
   const iconBg = LEVEL_ICON_BG[level] || LEVEL_ICON_BG[3];
+  const sc = 3 / numColumns;
+  const circleSize = Math.round(64 * sc);
 
   return (
     <View style={[
       S.itemCard,
       { backgroundColor: cardBg, width: '100%', height: '100%', aspectRatio: undefined },
     ]}>
-      <View style={[S.itemIconBg, { backgroundColor: iconBg }]}>
-        <PhotoOrIcon photoUri={item.photoUri} icon={item.icon} circleSize={48} iconSize={26} bgColor={iconBg} />
-      </View>
-      <Text style={S.itemCardLabel} numberOfLines={2}>{item.label}</Text>
+      {item.photoUri ? (
+        <Image
+          source={{ uri: item.photoUri }}
+          style={{ width: circleSize, height: circleSize, borderRadius: circleSize / 2, overflow: 'hidden' }}
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={[S.itemIconBg, { backgroundColor: iconBg, width: circleSize, height: circleSize, borderRadius: circleSize / 2 }]}>
+          <EmojiIcon name={item.icon || '📦'} size={Math.round(26 * sc)} />
+        </View>
+      )}
+      <Text style={[S.itemCardLabel, { fontSize: Math.round(13 * sc) }]} numberOfLines={2}>{item.label}</Text>
       
       {item.memo && (
         <View style={{ position: 'absolute', top: 6, right: 6, width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.85)', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 }}>
@@ -934,7 +954,7 @@ export function SearchModal({ visible, results, query, onChangeQuery, onCancel, 
 const NOTICES = [
   {
     id: 1,
-    title: '차곡차곡 앱이 출시되었습니다.',
+    title: '차곡차곡 정리앱이 출시되었습니다',
     body: '안녕하세요. 차곡차곡의 개발자입니다. 반갑습니다.',
     date: '2026.04.09',
   },
@@ -1272,13 +1292,21 @@ export function ViewerView({ hierarchy, onSaveHierarchy, onNavigate }) {
           </TouchableOpacity>
 
           {/* 아이콘 */}
-          <View style={{
-            width: 36, height: 36, borderRadius: 10,
-            backgroundColor: 'rgba(255,255,255,0.5)',
-            alignItems: 'center', justifyContent: 'center', marginRight: 10,
-          }}>
-            <EmojiIcon name={data.icon || 'category'} size={20} />
-          </View>
+          {data.photoUri ? (
+            <Image
+              source={{ uri: data.photoUri }}
+              style={{ width: 36, height: 36, borderRadius: 10, marginRight: 10 }}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={{
+              width: 36, height: 36, borderRadius: 10,
+              backgroundColor: 'rgba(255,255,255,0.5)',
+              alignItems: 'center', justifyContent: 'center', marginRight: 10,
+            }}>
+              <EmojiIcon name={data.icon || 'category'} size={20} />
+            </View>
+          )}
 
           {/* 라벨 & 메타 */}
           <View style={{ flex: 1 }}>
