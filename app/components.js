@@ -774,9 +774,6 @@ export function CategoryModal({ visible, mode, levelName, label, icon, photoUri,
               </View>
             </TouchableOpacity>
 
-            <Text style={[S.iconSectionHeader, { marginBottom: 8 }]}>
-              {photoUri ? '아이콘 선택 (사진 사용 중)' : '아이콘 선택'}
-            </Text>
             <IconPicker icon={icon} onChangeIcon={onChangeIcon} recentIcons={recentIcons} />
 
             <View style={S.modalActions}>
@@ -858,9 +855,6 @@ export function ItemModal({ visible, mode, label, qty, icon, photoUri, recentIco
                   </View>
                 </View>
 
-                <Text style={[S.iconSectionHeader, { marginBottom: 8 }]}>
-                  {photoUri ? '아이콘 선택 (사진 사용 중)' : '아이콘 선택'}
-                </Text>
                 <IconPicker icon={icon} onChangeIcon={onChangeIcon} recentIcons={recentIcons} />
 
                 <View style={S.modalActions}>
@@ -932,9 +926,18 @@ export function SearchModal({ visible, results, query, onChangeQuery, onCancel, 
                       <Text style={S.searchResultPath}>{['홈', ...item.pathLabels].join(' > ')}</Text>
                     )}
                   </View>
-                  {item.quantity != null && (
-                    <View style={S.itemQtyBadge}>
-                      <Text style={S.itemQtyText}>{item.quantity}개</Text>
+                  {(item.quantity != null || item.matchedMemo) && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      {item.quantity != null && (
+                        <View style={S.itemQtyBadge}>
+                          <Text style={S.itemQtyText}>{item.quantity}개</Text>
+                        </View>
+                      )}
+                      {item.matchedMemo && (
+                        <View style={[S.itemQtyBadge, { backgroundColor: C.primary + '18' }]}>
+                          <Text style={[S.itemQtyText, { color: C.primary }]}>메모</Text>
+                        </View>
+                      )}
                     </View>
                   )}
                 </TouchableOpacity>
@@ -1991,7 +1994,7 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
               <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🔍 검색 버튼(돋보기)</Text>
               <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
                 <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
-                  {'• 어디에 있든 한 번에 찾아낼 수 있습니다.'}
+                  {'• 어디에 있든 한 번에 찾아낼 수 있습니다.\n• 항목의 메모도 검색이 가능합니다.'}
                 </Text>
               </View>
 

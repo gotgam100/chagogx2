@@ -295,15 +295,21 @@ export function searchHierarchy(nodes, query, pathLabels = [], pathIds = []) {
   let results = [];
   if (!Array.isArray(nodes)) return results;
   for (const node of nodes) {
-    if (!node.none && node.label.toLowerCase().includes(q)) {
-      results.push({
-        id: node.id, icon: node.icon, photoUri: node.photoUri,
-        label: node.label,
-        quantity: node.quantity,
-        level: node.level,
-        pathLabels,
-        pathIds,
-      });
+    if (!node.none) {
+      const labelMatch = node.label.toLowerCase().includes(q);
+      const memoMatch = node.memo && node.memo.toLowerCase().includes(q);
+      if (labelMatch || memoMatch) {
+        results.push({
+          id: node.id, icon: node.icon, photoUri: node.photoUri,
+          label: node.label,
+          memo: node.memo,
+          quantity: node.quantity,
+          level: node.level,
+          pathLabels,
+          pathIds,
+          matchedMemo: memoMatch && !labelMatch,
+        });
+      }
     }
     if (node.children) {
       const nextPathLabels = node.none ? pathLabels : [...pathLabels, node.label];
