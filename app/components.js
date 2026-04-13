@@ -2,11 +2,11 @@ import React, { useRef, useEffect, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, Modal, TextInput, Image, Alert,
   FlatList, ScrollView, KeyboardAvoidingView, Platform, PanResponder,
-  Animated, SectionList, StyleSheet, Share, Dimensions, LayoutAnimation, Linking
+  Animated, SectionList, StyleSheet, Share, Dimensions, LayoutAnimation, Linking, Keyboard
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
-import { C, EMOJI_MAP, ICON_CATEGORIES, UI_EMOJI, LEVEL_NAMES } from './constants';
+import { C, EMOJI_MAP, ICON_CATEGORIES, UI_EMOJI, LEVEL_NAMES, ICON_NAMES } from './constants';
 import { findNodePathById } from './data';
 import { SpaceTree, MAX_SPACE, OBJECT_TYPES, hierarchyToSpaceTree, spaceTreeToHierarchy, typeToLevel, canBeParentType } from './spaceModel';
 import S from './styles';
@@ -235,35 +235,22 @@ async function pickPhoto(onResult) {
 }
 
 // ── IconPhotoHeader: 모달 상단 아이콘+사진버튼 ─────────────────────────────
-function IconPhotoHeader({ icon, photoUri, onChangePhoto, onChangeIcon, onTextModeChange, level = 0 }) {
-  const [textMode, setTextMode] = React.useState(false);
-  const [textValue, setTextValue] = React.useState('');
-  const textInputRef = useRef(null);
-
+function IconPhotoHeader({ icon, photoUri, onChangePhoto, onChangeIcon, level = 0 }) {
   // 아이콘이 커스텀 텍스트인지 판별
   const isMapped = !!(EMOJI_MAP[icon] || UI_EMOJI[icon]);
   const isCustomText = !isMapped && !!icon && icon !== '📦' && /[^\s]/.test(icon);
 
-  const setMode = (val) => {
-    setTextMode(val);
-    onTextModeChange?.(val);
-  };
-
   const handleTextMode = () => {
-    setTextValue(isCustomText ? icon : '');
-    setMode(true);
-    setTimeout(() => textInputRef.current?.focus(), 50);
-  };
-
-  const handleConfirm = () => {
-    // [...textValue]로 유니코드 코드포인트 기준 2글자 제한 (한글 조합 문제 방지)
-    const trimmed = [...textValue.trim()].slice(0, 2).join('');
-    if (trimmed) onChangeIcon(trimmed);
-    setMode(false);
-  };
-
-  const handleCancel = () => {
-    setMode(false);
+    Alert.prompt(
+      '문자 아이콘',
+      '최대 2글자를 입력하세요',
+      (text) => {
+        const trimmed = [...(text || '').trim()].slice(0, 2).join('');
+        if (trimmed) onChangeIcon(trimmed);
+      },
+      'plain-text',
+      isCustomText ? icon : '',
+    );
   };
 
   return (
@@ -276,93 +263,43 @@ function IconPhotoHeader({ icon, photoUri, onChangePhoto, onChangeIcon, onTextMo
             style={{ width: 80, height: 80, borderRadius: 40 }}
             resizeMode="cover"
           />
-        ) : textMode ? (
-          <TextInput
-            ref={textInputRef}
-            value={textValue}
-            onChangeText={(t) => setTextValue([...t].slice(0, 2).join(''))}
-            onSubmitEditing={handleConfirm}
-            autoCorrect={false}
-            spellCheck={false}
-            returnKeyType="done"
-            style={{
-              width: 80, height: 80,
-              fontSize: 17, fontWeight: '700',
-              textAlign: 'center',
-              color: C.onSurface,
-            }}
-          />
         ) : (
           <EmojiIcon name={icon || '📦'} size={40} />
         )}
       </View>
 
-      {/* 텍스트 모드: 확인/취소 버튼 */}
-      {textMode ? (
-        <>
-          <TouchableOpacity
-            style={{
-              position: 'absolute', bottom: -2, right: -2,
-              width: 30, height: 30, borderRadius: 15,
-              backgroundColor: C.primary,
-              alignItems: 'center', justifyContent: 'center',
-              shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.15, shadowRadius: 2, elevation: 2,
-            }}
-            onPress={handleConfirm}
-          >
-            <Text style={{ fontSize: 14, color: '#fff', fontWeight: '700' }}>✓</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              position: 'absolute', bottom: -2, left: -2,
-              width: 30, height: 30, borderRadius: 15,
-              backgroundColor: '#e0e0e0',
-              alignItems: 'center', justifyContent: 'center',
-              shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.1, shadowRadius: 2, elevation: 2,
-            }}
-            onPress={handleCancel}
-          >
-            <Text style={{ fontSize: 14, color: '#666' }}>✕</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          {/* 📷 소형 오버레이 버튼 (우측 하단) */}
-          <TouchableOpacity
-            style={{
-              position: 'absolute', bottom: -2, right: -2,
-              width: 30, height: 30, borderRadius: 15,
-              backgroundColor: '#ffffff',
-              alignItems: 'center', justifyContent: 'center',
-              borderWidth: 1.5, borderColor: '#d0d5d8',
-              shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.12, shadowRadius: 2, elevation: 2,
-            }}
-            onPress={() => pickPhoto(onChangePhoto)}
-          >
-            <Text style={{ fontSize: 14, lineHeight: 18 }}>📷</Text>
-          </TouchableOpacity>
+      {/* 📷 소형 오버레이 버튼 (우측 하단) */}
+      <TouchableOpacity
+        style={{
+          position: 'absolute', bottom: -2, right: -2,
+          width: 30, height: 30, borderRadius: 15,
+          backgroundColor: '#ffffff',
+          alignItems: 'center', justifyContent: 'center',
+          borderWidth: 1.5, borderColor: '#d0d5d8',
+          shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.12, shadowRadius: 2, elevation: 2,
+        }}
+        onPress={() => pickPhoto(onChangePhoto)}
+      >
+        <Text style={{ fontSize: 14, lineHeight: 18 }}>📷</Text>
+      </TouchableOpacity>
 
-          {/* 🔤 소형 오버레이 버튼 (좌측 하단) — 사진 없을 때만 */}
-          {!photoUri && (
-            <TouchableOpacity
-              style={{
-                position: 'absolute', bottom: -2, left: -2,
-                width: 30, height: 30, borderRadius: 15,
-                backgroundColor: '#ffffff',
-                alignItems: 'center', justifyContent: 'center',
-                borderWidth: 1.5, borderColor: '#d0d5d8',
-                shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.12, shadowRadius: 2, elevation: 2,
-              }}
-              onPress={handleTextMode}
-            >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: C.onSurfaceVariant }}>Aa</Text>
-            </TouchableOpacity>
-          )}
-        </>
+      {/* 🔤 소형 오버레이 버튼 (좌측 하단) — 사진 없을 때만 */}
+      {!photoUri && (
+        <TouchableOpacity
+          style={{
+            position: 'absolute', bottom: -2, left: -2,
+            width: 30, height: 30, borderRadius: 15,
+            backgroundColor: '#ffffff',
+            alignItems: 'center', justifyContent: 'center',
+            borderWidth: 1.5, borderColor: '#d0d5d8',
+            shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.12, shadowRadius: 2, elevation: 2,
+          }}
+          onPress={handleTextMode}
+        >
+          <Text style={{ fontSize: 13, fontWeight: '700', color: C.onSurfaceVariant }}>Aa</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -370,44 +307,112 @@ function IconPhotoHeader({ icon, photoUri, onChangePhoto, onChangeIcon, onTextMo
 
 // ── Shared: Categorized Icon Picker ───────────────────────────────────────────
 function IconPicker({ icon, onChangeIcon, recentIcons = [] }) {
-  // 커스텀 텍스트(EMOJI_MAP/UI_EMOJI에 없는 문자열)는 최근 사용에서 제외
-  const displayRecents = recentIcons.filter(ic => !!(EMOJI_MAP[ic] || UI_EMOJI[ic]));
+  const displayRecents = recentIcons.slice(0, 5);
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const allIcons = useMemo(() => ICON_CATEGORIES.flatMap(c => c.icons), []);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const q = searchQuery.toLowerCase();
+    return allIcons.filter(ic => {
+      const name = ICON_NAMES[ic];
+      return name && name.includes(q);
+    });
+  }, [searchQuery, allIcons]);
+
+  const handleSearch = () => {
+    Alert.prompt(
+      '아이콘 검색',
+      '아이콘 이름을 입력하세요 (예: 책상, 의자, 컵)',
+      (text) => setSearchQuery(text || ''),
+      'plain-text',
+      searchQuery,
+    );
+  };
 
   return (
-    <ScrollView style={S.iconPickerScroll} nestedScrollEnabled showsVerticalScrollIndicator={false}>
-      {displayRecents.length > 0 && (
-        <View style={S.iconSection}>
-          <Text style={S.iconSectionHeader}>⏱ 최근 사용</Text>
-          <View style={S.iconGrid5}>
-            {displayRecents.map((ic, idx) => (
-              <TouchableOpacity
-                key={`recent-${idx}-${ic}`}
-                style={[S.iconCell, ic === icon && S.iconCellActive]}
-                onPress={() => onChangeIcon(ic)}
-              >
-                <EmojiIcon name={ic} size={30} />
-              </TouchableOpacity>
+    <View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 8, gap: 8 }}>
+        {searchQuery !== '' && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <Text style={{ fontSize: 12, color: C.primary, fontWeight: '600' }}>초기화</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          onPress={() => { Keyboard.dismiss(); handleSearch(); }}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 4,
+            paddingHorizontal: 10, paddingVertical: 5,
+            borderRadius: 8, backgroundColor: C.surfaceVariant + '60',
+          }}
+        >
+          <Text style={{ fontSize: 12 }}>🔍</Text>
+          <Text style={{ fontSize: 12, color: C.onSurfaceVariant }}>
+            {searchQuery ? `"${searchQuery}"` : '아이콘 검색'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView style={S.iconPickerScroll} nestedScrollEnabled showsVerticalScrollIndicator={false}>
+        {searchResults ? (
+          searchResults.length > 0 ? (
+            <View style={S.iconSection}>
+              <Text style={S.iconSectionHeader}>🔍 검색 결과 ({searchResults.length}개)</Text>
+              <View style={S.iconGrid5}>
+                {searchResults.map((ic, idx) => (
+                  <TouchableOpacity
+                    key={`search-${idx}-${ic}`}
+                    style={[S.iconCell, ic === icon && S.iconCellActive]}
+                    onPress={() => onChangeIcon(ic)}
+                  >
+                    <EmojiIcon name={ic} size={30} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ) : (
+            <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+              <Text style={{ fontSize: 14, color: C.onSurfaceVariant }}>검색 결과가 없어요</Text>
+            </View>
+          )
+        ) : (
+          <>
+            {displayRecents.length > 0 && (
+              <View style={S.iconSection}>
+                <Text style={S.iconSectionHeader}>⏱ 최근 사용</Text>
+                <View style={S.iconGrid5}>
+                  {displayRecents.map((ic, idx) => (
+                    <TouchableOpacity
+                      key={`recent-${idx}-${ic}`}
+                      style={[S.iconCell, ic === icon && S.iconCellActive]}
+                      onPress={() => onChangeIcon(ic)}
+                    >
+                      <EmojiIcon name={ic} size={30} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+            {ICON_CATEGORIES.map((cat, catIdx) => (
+              <View key={`cat-${catIdx}`} style={S.iconSection}>
+                <Text style={S.iconSectionHeader}>{cat.name}</Text>
+                <View style={S.iconGrid5}>
+                  {cat.icons.map((ic, icIdx) => (
+                    <TouchableOpacity
+                      key={`cat-${catIdx}-${icIdx}-${ic}`}
+                      style={[S.iconCell, ic === icon && S.iconCellActive]}
+                      onPress={() => onChangeIcon(ic)}
+                    >
+                      <EmojiIcon name={ic} size={30} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
             ))}
-          </View>
-        </View>
-      )}
-      {ICON_CATEGORIES.map((cat, catIdx) => (
-        <View key={`cat-${catIdx}`} style={S.iconSection}>
-          <Text style={S.iconSectionHeader}>{cat.name}</Text>
-          <View style={S.iconGrid5}>
-            {cat.icons.map((ic, icIdx) => (
-              <TouchableOpacity
-                key={`cat-${catIdx}-${icIdx}-${ic}`}
-                style={[S.iconCell, ic === icon && S.iconCellActive]}
-                onPress={() => onChangeIcon(ic)}
-              >
-                <EmojiIcon name={ic} size={30} />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      ))}
-    </ScrollView>
+          </>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 // ── CategoryCard ──────────────────────────────────────────────────────────────
@@ -727,7 +732,6 @@ export function MemoModal({ visible, label, memo, onSave, onCancel }) {
 export function CategoryModal({ visible, mode, levelName, label, icon, photoUri, recentIcons,
   onChangeLabel, onChangeIcon, onChangePhoto, onSave, onCancel }) {
   const inputRef = useRef(null);
-  const [iconTextMode, setIconTextMode] = React.useState(false);
 
   const dismissPan = useRef(PanResponder.create({
     onMoveShouldSetPanResponder: (_, { dy, dx }) => dy > 8 && dy > Math.abs(dx),
@@ -737,10 +741,13 @@ export function CategoryModal({ visible, mode, levelName, label, icon, photoUri,
   const level = LEVEL_NAMES.indexOf(levelName) === -1 ? 0 : LEVEL_NAMES.indexOf(levelName);
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
-      <KeyboardAvoidingView style={{ flex: 1 }}>
-        <TouchableOpacity style={S.modalOverlay} activeOpacity={1} onPress={onCancel}>
-          <TouchableOpacity activeOpacity={1} style={S.modalSheet} onPress={() => {}}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={() => { Keyboard.dismiss(); onCancel(); }}>
+      <View style={{ flex: 1 }}>
+        <TouchableOpacity
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)' }}
+          activeOpacity={1} onPress={() => { Keyboard.dismiss(); onCancel(); }}
+        />
+        <View style={[S.modalSheet, { position: 'absolute', bottom: 0, left: 0, right: 0 }]}>
             <View {...dismissPan.panHandlers} style={{ alignItems: 'center', paddingBottom: 8 }}>
               <View style={S.actionHandle} />
             </View>
@@ -751,43 +758,37 @@ export function CategoryModal({ visible, mode, levelName, label, icon, photoUri,
               photoUri={photoUri}
               onChangePhoto={onChangePhoto}
               onChangeIcon={onChangeIcon}
-              onTextModeChange={setIconTextMode}
               level={level}
             />
 
-            {!iconTextMode && (
-              <>
-                <TouchableOpacity onPress={() => inputRef.current?.focus()} activeOpacity={1}>
-                  <View style={[S.modalInput, { justifyContent: 'center' }]} pointerEvents="none">
-                    <TextInput
-                      ref={inputRef}
-                      value={label}
-                      onChangeText={onChangeLabel}
-                      placeholder="이름 입력"
-                      placeholderTextColor={C.outlineVariant}
-                      style={{ fontSize: 15, color: C.onSurface }}
-                    />
-                  </View>
-                </TouchableOpacity>
+            <TouchableOpacity onPress={() => inputRef.current?.focus()} activeOpacity={1}>
+              <View style={[S.modalInput, { justifyContent: 'center' }]} pointerEvents="none">
+                <TextInput
+                  ref={inputRef}
+                  value={label}
+                  onChangeText={onChangeLabel}
+                  placeholder="이름 입력"
+                  placeholderTextColor={C.outlineVariant}
+                  style={{ fontSize: 15, color: C.onSurface }}
+                />
+              </View>
+            </TouchableOpacity>
 
-                <Text style={[S.iconSectionHeader, { marginBottom: 8 }]}>
-                  {photoUri ? '아이콘 선택 (사진 사용 중)' : '아이콘 선택'}
-                </Text>
-                <IconPicker icon={icon} onChangeIcon={onChangeIcon} recentIcons={recentIcons} />
+            <Text style={[S.iconSectionHeader, { marginBottom: 8 }]}>
+              {photoUri ? '아이콘 선택 (사진 사용 중)' : '아이콘 선택'}
+            </Text>
+            <IconPicker icon={icon} onChangeIcon={onChangeIcon} recentIcons={recentIcons} />
 
-                <View style={S.modalActions}>
-                  <TouchableOpacity style={S.cancelBtn} onPress={onCancel}>
-                    <Text style={S.cancelBtnText}>취소</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={S.saveBtn} onPress={onSave}>
-                    <Text style={S.saveBtnText}>저장</Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+            <View style={S.modalActions}>
+              <TouchableOpacity style={S.cancelBtn} onPress={onCancel}>
+                <Text style={S.cancelBtnText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={S.saveBtn} onPress={onSave}>
+                <Text style={S.saveBtnText}>저장</Text>
+              </TouchableOpacity>
+            </View>
+        </View>
+      </View>
     </Modal>
   );
 }
@@ -796,7 +797,6 @@ export function CategoryModal({ visible, mode, levelName, label, icon, photoUri,
 export function ItemModal({ visible, mode, label, qty, icon, photoUri, recentIcons,
   onChangeLabel, onChangeQty, onChangeIcon, onChangePhoto, onSave, onCancel }) {
   const inputRef = useRef(null);
-  const [iconTextMode, setIconTextMode] = React.useState(false);
   const [qtyInputVisible, setQtyInputVisible] = React.useState(false);
   const dismissPan = useRef(PanResponder.create({
     onMoveShouldSetPanResponder: (_, { dy, dx }) => dy > 8 && dy > Math.abs(dx),
@@ -804,10 +804,13 @@ export function ItemModal({ visible, mode, label, qty, icon, photoUri, recentIco
   })).current;
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
-      <KeyboardAvoidingView style={{ flex: 1 }}>
-        <TouchableOpacity style={S.modalOverlay} activeOpacity={1} onPress={onCancel}>
-          <TouchableOpacity activeOpacity={1} style={[S.modalSheet, { maxHeight: '90%' }]} onPress={() => {}}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={() => { Keyboard.dismiss(); onCancel(); }}>
+      <View style={{ flex: 1 }}>
+        <TouchableOpacity
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)' }}
+          activeOpacity={1} onPress={() => { Keyboard.dismiss(); onCancel(); }}
+        />
+        <View style={[S.modalSheet, { position: 'absolute', bottom: 0, left: 0, right: 0, maxHeight: '90%' }]}>
             <View {...dismissPan.panHandlers} style={{ alignItems: 'center', paddingBottom: 8 }}>
               <View style={S.actionHandle} />
             </View>
@@ -818,12 +821,9 @@ export function ItemModal({ visible, mode, label, qty, icon, photoUri, recentIco
               photoUri={photoUri}
               onChangePhoto={onChangePhoto}
               onChangeIcon={onChangeIcon}
-              onTextModeChange={setIconTextMode}
               level={3}
             />
 
-            {!iconTextMode && (
-              <>
                 <TouchableOpacity onPress={() => inputRef.current?.focus()} activeOpacity={1}>
                   <View style={[S.modalInput, { justifyContent: 'center' }]} pointerEvents="none">
                     <TextInput
@@ -871,11 +871,8 @@ export function ItemModal({ visible, mode, label, qty, icon, photoUri, recentIco
                     <Text style={S.saveBtnText}>저장</Text>
                   </TouchableOpacity>
                 </View>
-              </>
-            )}
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+        </View>
+      </View>
     </Modal>
   );
 }
@@ -1946,10 +1943,10 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
 
       {/* 사용법 모달 */}
       <Modal visible={usageModalVisible} transparent animationType="slide" onRequestClose={() => setUsageModalVisible(false)}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
-          activeOpacity={1} onPress={() => setUsageModalVisible(false)}>
-          <TouchableOpacity activeOpacity={1} onPress={() => {}}
-            style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <TouchableOpacity style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)' }}
+            activeOpacity={1} onPress={() => setUsageModalVisible(false)} />
+          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
             <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>📖 사용법</Text>
               <TouchableOpacity onPress={() => setUsageModalVisible(false)}>
@@ -1958,51 +1955,65 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
             </View>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
 
-              {/* 홈화면 */}
-              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🏠 홈화면</Text>
+              {/* 홈탭 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🏠 홈탭</Text>
               <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
                 <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
-                  {'■ 공간(Space) 추가\n'}
-                  {'화면 하단의 + 버튼을 눌러 새로운 공간(예: 거실, 침실, 창고)을 만들 수 있습니다.\n\n'}
-                  {'■ 공간 탭 전환\n'}
-                  {'상단의 탭을 눌러 등록된 공간들 사이를 빠르게 이동할 수 있습니다.\n\n'}
-                  {'■ 가구 & 구획 추가\n'}
-                  {'공간을 선택한 뒤 + 버튼으로 가구(예: 서랍장, 책장)와 구획(예: 1칸, 2칸)을 계층적으로 추가할 수 있습니다.\n\n'}
-                  {'■ 물건 등록\n'}
-                  {'구획 내 + 버튼을 눌러 물건의 이름, 수량, 아이콘을 설정하고 등록합니다.\n\n'}
-                  {'■ 물건 검색\n'}
-                  {'상단 검색 아이콘을 눌러 물건 이름으로 빠르게 위치를 찾을 수 있습니다.'}
+                  {'• 항목 카드를 터치하면 하위 레벨로 이동이 가능합니다.\n'}
+                  {'• 항목 카드를 길게 누르면 편집창이 나타납니다.\n'}
+                  {'• 편집창에서는 수정, 복제, 메모 등이 가능합니다.\n'}
+                  {'• 항목 등록은 \'+\'버튼으로 가능합니다.\n'}
+                  {'• 등록 시 아이콘 혹은 사진, 문자로 등록이 가능합니다.\n'}
+                  {'• 크기 조절을 통해 더 크게 볼 수도 있습니다.'}
                 </Text>
               </View>
 
-              {/* 정리화면 */}
-              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🗂️ 정리화면</Text>
+              {/* 정리탭 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🗂️ 정리탭</Text>
               <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
                 <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
-                  {'■ 항목 이동\n'}
-                  {'항목을 길게 누르면 이동 모드가 활성화됩니다. 원하는 위치로 드래그하여 순서를 바꾸거나 다른 구획으로 이동시킬 수 있습니다.\n\n'}
-                  {'■ 다중 선택\n'}
-                  {'항목을 길게 눌러 다중 선택 모드로 전환한 뒤, 여러 물건을 한 번에 이동하거나 삭제할 수 있습니다.\n\n'}
-                  {'■ 항목 수정 및 삭제\n'}
-                  {'등록된 항목을 탭하면 이름, 수량, 아이콘을 수정할 수 있습니다. 좌로 스와이프하면 삭제 버튼이 나타납니다.\n\n'}
-                  {'■ 접기 / 펼치기\n'}
-                  {'가구나 구획 헤더를 탭하면 해당 항목을 접거나 펼쳐 화면을 깔끔하게 정리할 수 있습니다.'}
+                  {'• 모든 항목을 한 눈에 볼 수 있습니다.\n'}
+                  {'• 위치를 이동하거나 계층을 이동시킬 수 있습니다.\n'}
+                  {'• 다중선택하여 한꺼번에 이동시킬 수 있습니다.\n'}
+                  {'• 간편하게 삭제가 가능합니다.'}
+                </Text>
+              </View>
+
+              {/* 물건들탭 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>📦 물건들탭</Text>
+              <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
+                <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
+                  {'• 모든 물건들을 한 눈에 볼 수 있습니다.'}
+                </Text>
+              </View>
+
+              {/* 검색 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🔍 검색 버튼(돋보기)</Text>
+              <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
+                <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
+                  {'• 어디에 있든 한 번에 찾아낼 수 있습니다.'}
+                </Text>
+              </View>
+
+              {/* 설정탭 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>⚙️ 설정탭</Text>
+              <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
+                <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
+                  {'• 로그인 후 개인정보관리에서 내 등록 정보를 나의 장치에 저장하거나 불러올 수 있습니다.'}
                 </Text>
               </View>
 
               {/* 팁 */}
-              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>💡 유용한 팁</Text>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>💡 팁</Text>
               <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 8 }}>
                 <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
-                  {'• 이메일로 가입하면 여러 기기에서 데이터를 동기화할 수 있습니다.\n'}
-                  {'• 설정 > 개인정보 관리에서 데이터를 백업하거나 불러올 수 있습니다.\n'}
-                  {'• 공간·가구·구획의 이름과 아이콘을 자유롭게 지정해 나만의 정리 체계를 만들어보세요.'}
+                  {'• 갯수를 조절할 때 \'+\'버튼을 꾹 누르고 있으면 수동으로 갯수 입력이 가능합니다.'}
                 </Text>
               </View>
 
             </ScrollView>
-          </TouchableOpacity>
-        </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
 
       {/* 공지사항 모달 */}
@@ -2023,10 +2034,10 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
 
       {/* 이용약관 모달 */}
       <Modal visible={termsModalVisible} transparent animationType="slide" onRequestClose={() => setTermsModalVisible(false)}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
-          activeOpacity={1} onPress={() => setTermsModalVisible(false)}>
-          <TouchableOpacity activeOpacity={1} onPress={() => {}}
-            style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <TouchableOpacity style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)' }}
+            activeOpacity={1} onPress={() => setTermsModalVisible(false)} />
+          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
             <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>📄 이용약관</Text>
               <TouchableOpacity onPress={() => setTermsModalVisible(false)}>
@@ -2076,16 +2087,16 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
               style={{ marginHorizontal: 20, marginTop: 12, marginBottom: 36, paddingVertical: 13, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: C.primary }}>
               <Text style={{ fontSize: 14, fontWeight: '600', color: C.primary }}>🔗 웹에서 전문 보기</Text>
             </TouchableOpacity>
-          </TouchableOpacity>
-        </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
 
       {/* 개인정보 처리방침 모달 */}
       <Modal visible={policyModalVisible} transparent animationType="slide" onRequestClose={() => setPolicyModalVisible(false)}>
-        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
-          activeOpacity={1} onPress={() => setPolicyModalVisible(false)}>
-          <TouchableOpacity activeOpacity={1} onPress={() => {}}
-            style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <TouchableOpacity style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)' }}
+            activeOpacity={1} onPress={() => setPolicyModalVisible(false)} />
+          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
             <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>🔒 개인정보 처리방침</Text>
               <TouchableOpacity onPress={() => setPolicyModalVisible(false)}>
@@ -2133,8 +2144,8 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
               style={{ marginHorizontal: 20, marginTop: 12, marginBottom: 36, paddingVertical: 13, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: C.primary }}>
               <Text style={{ fontSize: 14, fontWeight: '600', color: C.primary }}>🔗 웹에서 전문 보기</Text>
             </TouchableOpacity>
-          </TouchableOpacity>
-        </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
 
       {/* 오픈소스 라이선스 모달 */}

@@ -21,6 +21,7 @@ import * as Font from 'expo-font';
 
 const STORAGE_KEY = 'CHAGOK_HIERARCHY_V1';
 const BACKUP_KEY = 'CHAGOK_HIERARCHY_BACKUP';
+const RECENT_ICONS_KEY = 'CHAGOK_RECENT_ICONS';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const H_PAD = 16;
@@ -81,7 +82,11 @@ export default function App() {
   // Recent icons
   const [recentIcons, setRecentIcons] = useState([]);
   const [colsByLevel, setColsByLevel] = useState({ 0: 3, 1: 3, 2: 3, 3: 3 });
-  const addToRecent = (ic) => setRecentIcons(prev => [ic, ...prev.filter(x => x !== ic)].slice(0, 5));
+  const addToRecent = (ic) => setRecentIcons(prev => {
+    const next = [ic, ...prev.filter(x => x !== ic)].slice(0, 10);
+    AsyncStorage.setItem(RECENT_ICONS_KEY, JSON.stringify(next)).catch(() => {});
+    return next;
+  });
 
   const level = path.length;
   const LC = LEVEL_COLORS[Math.min(level, 3)];
@@ -114,6 +119,8 @@ export default function App() {
           // 레벨 마이그레이션 수행
           setHierarchy(ensureLevels(parsed));
         }
+        const savedIcons = await AsyncStorage.getItem(RECENT_ICONS_KEY);
+        if (savedIcons !== null) setRecentIcons(JSON.parse(savedIcons));
       } catch (e) {
         console.error('Failed to load storage:', e);
       } finally {
