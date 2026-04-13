@@ -1684,6 +1684,7 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
   const [signupModalVisible, setSignupModalVisible] = React.useState(false);
   const [privacyModalVisible, setPrivacyModalVisible] = React.useState(false);
   const [noticeModalVisible, setNoticeModalVisible] = React.useState(false);
+  const [usageModalVisible, setUsageModalVisible] = React.useState(false);
   const [termsModalVisible, setTermsModalVisible] = React.useState(false);
   const [policyModalVisible, setPolicyModalVisible] = React.useState(false);
   const [licenseModalVisible, setLicenseModalVisible] = React.useState(false);
@@ -1784,6 +1785,7 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
         </Text>
         <View style={{ borderRadius: 14, overflow: 'hidden', marginHorizontal: 16, marginBottom: 24 }}>
           <SettingRow icon="🔔" label="공지사항" onPress={() => setNoticeModalVisible(true)} />
+          <SettingRow icon="📖" label="사용법" onPress={() => setUsageModalVisible(true)} />
         </View>
 
         {/* 앱 정보 */}
@@ -1938,6 +1940,67 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
               style={{ paddingVertical: 14, borderRadius: 14, alignItems: 'center', backgroundColor: C.primary }}>
               <Text style={{ fontSize: 17, fontWeight: '600', color: '#fff' }}>확인</Text>
             </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* 사용법 모달 */}
+      <Modal visible={usageModalVisible} transparent animationType="slide" onRequestClose={() => setUsageModalVisible(false)}>
+        <TouchableOpacity style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
+          activeOpacity={1} onPress={() => setUsageModalVisible(false)}>
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}
+            style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, height: '90%', flexDirection: 'column' }}>
+            <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.outlineVariant + '30', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: C.onSurface }}>📖 사용법</Text>
+              <TouchableOpacity onPress={() => setUsageModalVisible(false)}>
+                <Text style={{ fontSize: 16, color: C.primary, fontWeight: '600' }}>닫기</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+
+              {/* 홈화면 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🏠 홈화면</Text>
+              <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
+                <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
+                  {'■ 공간(Space) 추가\n'}
+                  {'화면 하단의 + 버튼을 눌러 새로운 공간(예: 거실, 침실, 창고)을 만들 수 있습니다.\n\n'}
+                  {'■ 공간 탭 전환\n'}
+                  {'상단의 탭을 눌러 등록된 공간들 사이를 빠르게 이동할 수 있습니다.\n\n'}
+                  {'■ 가구 & 구획 추가\n'}
+                  {'공간을 선택한 뒤 + 버튼으로 가구(예: 서랍장, 책장)와 구획(예: 1칸, 2칸)을 계층적으로 추가할 수 있습니다.\n\n'}
+                  {'■ 물건 등록\n'}
+                  {'구획 내 + 버튼을 눌러 물건의 이름, 수량, 아이콘을 설정하고 등록합니다.\n\n'}
+                  {'■ 물건 검색\n'}
+                  {'상단 검색 아이콘을 눌러 물건 이름으로 빠르게 위치를 찾을 수 있습니다.'}
+                </Text>
+              </View>
+
+              {/* 정리화면 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>🗂️ 정리화면</Text>
+              <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 20 }}>
+                <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
+                  {'■ 항목 이동\n'}
+                  {'항목을 길게 누르면 이동 모드가 활성화됩니다. 원하는 위치로 드래그하여 순서를 바꾸거나 다른 구획으로 이동시킬 수 있습니다.\n\n'}
+                  {'■ 다중 선택\n'}
+                  {'항목을 길게 눌러 다중 선택 모드로 전환한 뒤, 여러 물건을 한 번에 이동하거나 삭제할 수 있습니다.\n\n'}
+                  {'■ 항목 수정 및 삭제\n'}
+                  {'등록된 항목을 탭하면 이름, 수량, 아이콘을 수정할 수 있습니다. 좌로 스와이프하면 삭제 버튼이 나타납니다.\n\n'}
+                  {'■ 접기 / 펼치기\n'}
+                  {'가구나 구획 헤더를 탭하면 해당 항목을 접거나 펼쳐 화면을 깔끔하게 정리할 수 있습니다.'}
+                </Text>
+              </View>
+
+              {/* 팁 */}
+              <Text style={{ fontSize: 16, fontWeight: '700', color: C.primary, marginBottom: 8 }}>💡 유용한 팁</Text>
+              <View style={{ backgroundColor: C.surfaceVariant + '40', borderRadius: 12, padding: 14, marginBottom: 8 }}>
+                <Text style={{ fontSize: 14, color: C.onSurface, lineHeight: 24 }}>
+                  {'• 이메일로 가입하면 여러 기기에서 데이터를 동기화할 수 있습니다.\n'}
+                  {'• 설정 > 개인정보 관리에서 데이터를 백업하거나 불러올 수 있습니다.\n'}
+                  {'• 공간·가구·구획의 이름과 아이콘을 자유롭게 지정해 나만의 정리 체계를 만들어보세요.'}
+                </Text>
+              </View>
+
+            </ScrollView>
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
