@@ -22,6 +22,7 @@ import * as Font from 'expo-font';
 const STORAGE_KEY = 'CHAGOK_HIERARCHY_V1';
 const BACKUP_KEY = 'CHAGOK_HIERARCHY_BACKUP';
 const RECENT_ICONS_KEY = 'CHAGOK_RECENT_ICONS';
+const COLS_BY_LEVEL_KEY = 'CHAGOK_COLS_BY_LEVEL';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const H_PAD = 16;
@@ -121,6 +122,8 @@ export default function App() {
         }
         const savedIcons = await AsyncStorage.getItem(RECENT_ICONS_KEY);
         if (savedIcons !== null) setRecentIcons(JSON.parse(savedIcons));
+        const savedCols = await AsyncStorage.getItem(COLS_BY_LEVEL_KEY);
+        if (savedCols !== null) setColsByLevel(JSON.parse(savedCols));
       } catch (e) {
         console.error('Failed to load storage:', e);
       } finally {
@@ -469,7 +472,11 @@ export default function App() {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <TouchableOpacity
           style={[S.addBtn, { backgroundColor: LC.pill + '80' }]}
-          onPress={() => setColsByLevel(prev => ({ ...prev, [level]: prev[level] === 3 ? 2 : 3 }))}
+          onPress={() => setColsByLevel(prev => {
+              const next = { ...prev, [level]: prev[level] === 3 ? 2 : 3 };
+              AsyncStorage.setItem(COLS_BY_LEVEL_KEY, JSON.stringify(next)).catch(() => {});
+              return next;
+            })}
         >
           <Text style={{ fontSize: 14, color: LC.accent }}>{colsByLevel[level] === 3 ? '⊞' : '▦'}</Text>
           <Text style={[S.addBtnText, { color: LC.accent }]}>크기 조절</Text>
