@@ -1804,7 +1804,7 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
           }}>
             <Text style={{ fontSize: 20, width: 28, textAlign: 'center' }}>📦</Text>
             <Text style={{ flex: 1, fontSize: 16, fontWeight: '500', color: C.onSurface }}>버전</Text>
-            <Text style={{ fontSize: 14, color: C.onSurfaceVariant }}>1.0.0</Text>
+            <Text style={{ fontSize: 14, color: C.onSurfaceVariant }}>1.1.0</Text>
           </View>
           <View style={{
             flexDirection: 'row', alignItems: 'center', gap: 14,
@@ -1816,7 +1816,7 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
             <Text style={{ fontSize: 14, color: C.onSurfaceVariant }}>qbeck104@gmail.com</Text>
           </View>
           <TouchableOpacity
-            onPress={() => Alert.alert('안내', '앱 출시 후 스토어로 연결됩니다.')}
+            onPress={() => Linking.openURL('https://apps.apple.com/app/id6762077357?action=write-review')}
             style={{
               flexDirection: 'row', alignItems: 'center', gap: 14,
               backgroundColor: '#fff', paddingHorizontal: 18, paddingVertical: 16,
@@ -1831,7 +1831,8 @@ export function SettingsView({ onReset, hierarchy, onBackupLocal, onRestoreLocal
             onPress={async () => {
               try {
                 await Share.share({
-                  message: '[차곡차곡] 함께 정리 정돈 시작해요! 깔끔한 정리의 시작, 차곡차곡 앱을 추천합니다. 앱 스토어에서 확인해보세요!',
+                  message: '[차곡차곡] 함께 정리 정돈 시작해요! 깔끔한 정리의 시작, 차곡차곡 앱을 추천합니다.',
+                  url: 'https://apps.apple.com/app/id6762077357',
                 });
               } catch (e) {
                 console.error(e);
