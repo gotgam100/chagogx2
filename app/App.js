@@ -28,6 +28,8 @@ const COLS_BY_LEVEL_KEY = 'CHAGOK_COLS_BY_LEVEL';
 const { width: SCREEN_W } = Dimensions.get('window');
 const H_PAD = 16;
 const GRID_W = SCREEN_W - H_PAD * 2;
+const IS_TABLET = SCREEN_W >= 768;
+const DEFAULT_COLS = IS_TABLET ? 4 : 3;
 const CARD_W = GRID_W * 0.305;
 const CARD_H = CARD_W * (5 / 4);
 
@@ -83,7 +85,7 @@ export default function App() {
 
   // Recent icons
   const [recentIcons, setRecentIcons] = useState([]);
-  const [colsByLevel, setColsByLevel] = useState({ 0: 3, 1: 3, 2: 3, 3: 3 });
+  const [colsByLevel, setColsByLevel] = useState({ 0: DEFAULT_COLS, 1: DEFAULT_COLS, 2: DEFAULT_COLS, 3: DEFAULT_COLS });
   const addToRecent = (ic) => setRecentIcons(prev => {
     const next = [ic, ...prev.filter(x => x !== ic)].slice(0, 10);
     AsyncStorage.setItem(RECENT_ICONS_KEY, JSON.stringify(next)).catch(() => {});
@@ -488,12 +490,13 @@ export default function App() {
         <TouchableOpacity
           style={[S.addBtn, { backgroundColor: LC.pill + '80' }]}
           onPress={() => setColsByLevel(prev => {
-              const next = { ...prev, [level]: prev[level] === 3 ? 2 : 3 };
+              const cur = prev[level] ?? DEFAULT_COLS;
+              const next = { ...prev, [level]: cur === DEFAULT_COLS ? DEFAULT_COLS - 1 : DEFAULT_COLS };
               AsyncStorage.setItem(COLS_BY_LEVEL_KEY, JSON.stringify(next)).catch(() => {});
               return next;
             })}
         >
-          <Text style={{ fontSize: 14, color: LC.accent }}>{colsByLevel[level] === 3 ? '⊞' : '▦'}</Text>
+          <Text style={{ fontSize: 14, color: LC.accent }}>{(colsByLevel[level] ?? DEFAULT_COLS) === DEFAULT_COLS ? '⊞' : '▦'}</Text>
           <Text style={[S.addBtnText, { color: LC.accent }]}>크기 조절</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[S.addBtn, { backgroundColor: LC.pill + '80' }]} onPress={handleAdd}>

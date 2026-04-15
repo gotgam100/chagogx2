@@ -10,6 +10,10 @@ import { C, EMOJI_MAP, ICON_CATEGORIES, UI_EMOJI, LEVEL_NAMES, ICON_NAMES } from
 import { findNodePathById } from './data';
 import { SpaceTree, MAX_SPACE, OBJECT_TYPES, hierarchyToSpaceTree, spaceTreeToHierarchy, typeToLevel, canBeParentType } from './spaceModel';
 import S from './styles';
+
+const { width: DEVICE_WIDTH } = Dimensions.get('window');
+const BASE_CARD_W = (375 - 32) / 3; // 기준 카드 너비 (iPhone 3열 기준 ~114px)
+
 import { auth as firebaseAuthCore } from './firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -428,7 +432,7 @@ export function CategoryCard({ item, onMenuPress, level = 0, numColumns = 3 }) {
   const isNone = !!item.none;
   const cardBg = isNone ? NONE_CARD : (LEVEL_CARD_BG[level] || LEVEL_CARD_BG[0]);
   const iconBg = isNone ? NONE_CIRCLE : (LEVEL_ICON_BG[level] || LEVEL_ICON_BG[0]);
-  const sc = 3 / numColumns;
+  const sc = Math.min(((DEVICE_WIDTH - 32) / numColumns) / BASE_CARD_W, 2.5);
   const circleSize = Math.round(72 * sc);
 
   return (
@@ -462,7 +466,7 @@ export function ItemCard({ item, onMenuPress, onUpdateQty, onManualQty, level = 
   const qty = item.quantity ?? 1;
   const cardBg = LEVEL_CARD_BG[level] || LEVEL_CARD_BG[3];
   const iconBg = LEVEL_ICON_BG[level] || LEVEL_ICON_BG[3];
-  const sc = 3 / numColumns;
+  const sc = Math.min(((DEVICE_WIDTH - 32) / numColumns) / BASE_CARD_W, 2.5);
   const circleSize = Math.round(64 * sc);
 
   return (
