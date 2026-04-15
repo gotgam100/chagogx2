@@ -1551,7 +1551,7 @@ export function LoginModal({ visible, onClose, firebaseAuth }) {
         style={{ flex: 1 }}
       >
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-start', paddingTop: '30%', padding: 20 }}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 20 }}
           activeOpacity={1}
           onPress={onClose}
         >
@@ -1632,7 +1632,7 @@ export function SignupModal({ visible, onClose, firebaseAuth }) {
         style={{ flex: 1 }}
       >
         <TouchableOpacity
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-start', paddingTop: '30%', padding: 20 }}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 20 }}
           activeOpacity={1}
           onPress={onClose}
         >
