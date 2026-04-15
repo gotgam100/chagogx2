@@ -1567,7 +1567,6 @@ export function LoginModal({ visible, onClose, firebaseAuth }) {
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
-              autoFocus={true}
             />
             <TextInput
               style={{
@@ -1648,7 +1647,6 @@ export function SignupModal({ visible, onClose, firebaseAuth }) {
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
-              autoFocus={true}
             />
             <TextInput
               style={{
