@@ -4,6 +4,7 @@ import { View, ScrollView, TouchableOpacity, Text, Alert, Animated, Dimensions, 
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
+import * as Updates from 'expo-updates';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as DocumentPicker from 'expo-document-picker';
@@ -109,6 +110,20 @@ export default function App() {
   // ── Persistence ────────────────────────────────────────────────────────────
   // Auto-load on boot
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // OTA 업데이트 즉시 적용
+  useEffect(() => {
+    if (__DEV__) return;
+    (async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (e) {}
+    })();
+  }, []);
 
   // Initial load
   useEffect(() => {
